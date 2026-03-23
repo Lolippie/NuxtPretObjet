@@ -40,7 +40,6 @@ const isAuthenticated = useState<boolean>('isAuthenticated', () => false);
       method: 'POST',
       body: { username, password }
     })
-    console.log("EHEHHEHE");
 
     token.value = "veveververver"
     //activeUser.value = response;
@@ -53,7 +52,6 @@ const isAuthenticated = useState<boolean>('isAuthenticated', () => false);
       navigateTo('/login');
     }
 
-    //@TODO REDIRIGER VERS LA PROFILE PAGE
   }
 
   function logout() {
