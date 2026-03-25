@@ -2,15 +2,22 @@
 import type { Object } from '@/types/object'
 
 const activeObject = ref<Object | null>(null)
+const isDetailOpen = ref(false)
 
 function selectObject(object: Object) {
   activeObject.value = object
   console.log('Objet sélectionné :', object)
+  isDetailOpen.value = true
 }
 
 function unselectObject() {
   activeObject.value = null
   console.log('Aucun Objet sélectionné')
+  isDetailOpen.value = false
+}
+
+function closeDetail() {
+  isDetailOpen.value = false
 }
 
 const search = ref('')
@@ -21,38 +28,38 @@ const {data: objects, pending, error} = useFetch<Object[]>('/api/objects/object'
 </script>
 
 <template>
-  <ClientOnly>
-    <div v-if="pending">Chargement des objets...</div>
+  <input
+      v-model="search"
+      type="text"
+      placeholder="Rechercher un objet..."
+      class=" text-grey-500" >
 
-    <div v-else-if="error">Erreur de chargement</div>
-
-    <input
-        v-model="search"
-        type="text"
-        placeholder="Rechercher un objet..."
-        class=" text-grey-500" >
-
-    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        <ObjectCard
-          tabindex="0"
+  <div class="flex gap-6 p-4">
+    <div class="flex-1 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+      <ObjectCard
           v-for="object in objects"
           :key="object.id"
           :object="object"
           :selected="activeObject?.id === object.id"
           @select="selectObject"
-          @keyup.enter="selectObject"
-          @keyup.esc="unselectObject"
       />
     </div>
-    <section v-if="activeObject?.id" >
+
+    <aside
+        class="fixed right-0 top-0 z-50 h-screen w-full max-w-sm overflow-y-auto bg-gray-900 p-4 text-gray-100 shadow-2xl transition-transform duration-300"
+        :class="isDetailOpen ? 'translate-x-0' : 'translate-x-full'"
+    >
+      <div class="mb-3 flex justify-end">
+        <button class="rounded px-2 py-1 hover:bg-gray-700" @click="closeDetail">✕</button>
+      </div>
+
       <ObjectDetailledCard
+          v-if="activeObject"
           :object="activeObject"
           :selected="true"
-          @select="selectObject"
       />
-    </section>
-
-  </ClientOnly>
+    </aside>
+  </div>
 </template>
 
 <style scoped>
